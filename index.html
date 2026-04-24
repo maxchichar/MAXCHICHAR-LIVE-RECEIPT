@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MAXCHICHAR LIVE RECEIPT</title>
+  <style>
+    :root {
+      --bg: #f4f1eb;
+      --bg-2: #ece7de;
+      --ink: #111111;
+      --muted: #666156;
+      --line: rgba(17, 17, 17, 0.08);
+      --panel: rgba(255, 255, 255, 0.56);
+      --shadow: rgba(30, 24, 15, 0.12);
+      --accent: #101820;
+      --accent-soft: #7d7567;
+      --gold: #b99862;
+      --glow: rgba(185, 152, 98, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background:
+        radial-gradient(circle at 18% 20%, rgba(255,255,255,0.84), transparent 34%),
+        radial-gradient(circle at 82% 24%, rgba(210,196,170,0.22), transparent 30%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(0,0,0,0.024) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.024) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mask-image: radial-gradient(circle at center, black 28%, transparent 88%);
+      pointer-events: none;
+    }
+
+    #scene {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+    }
+
+    .shell {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(320px, 560px) 1fr;
+      align-items: center;
+      gap: min(6vw, 72px);
+      padding: clamp(24px, 4vw, 56px);
+      pointer-events: none;
+    }
+
+    .panel {
+      pointer-events: auto;
+      max-width: 560px;
+      padding: clamp(24px, 3vw, 40px);
+      border: 1px solid rgba(17,17,17,0.06);
+      background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.44));
+      backdrop-filter: blur(12px);
+      border-radius: 28px;
+      box-shadow:
+        0 30px 80px rgba(42, 33, 20, 0.08),
+        inset 0 1px 0 rgba(255,255,255,0.72);
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(16, 24, 32, 0.05);
+      border: 1px solid rgba(16, 24, 32, 0.08);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #d1b281, #aa8550);
+      box-shadow: 0 0 18px rgba(185, 152, 98, 0.5);
+    }
+
+    .micro-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .micro-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: #2a241d;
+      background: rgba(255,255,255,0.52);
+      border: 1px solid rgba(17,17,17,0.08);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 18px 0 0;
+      font-size: clamp(42px, 7vw, 82px);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .lead {
+      margin: 18px 0 0;
+      font-size: clamp(15px, 1.35vw, 18px);
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 44ch;
+    }
+
+    .problem {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.48);
+      border: 1px solid rgba(17,17,17,0.06);
+    }
+
+    .problem-title {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .problem-copy {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #322d27;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+      pointer-events: auto;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button.primary {
+      color: #fff;
+      background: linear-gradient(180deg, #111111, #232323);
+      box-shadow: 0 16px 34px rgba(0,0,0,0.16);
+    }
+
+    .button.secondary {
+      color: var(--ink);
+      background: rgba(255,255,255,0.58);
+      border: 1px solid rgba(17,17,17,0.08);
+      box-shadow: 0 12px 28px rgba(20,20,20,0.06);
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .meta-card {
+      padding: 16px 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.5);
+      border: 1px solid rgba(17,17,17,0.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+    }
+
+    .meta-label {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .meta-value {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .meta-value:hover {
+      text-decoration: underline;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .feature {
+      padding: 14px 14px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.44);
+      border: 1px solid rgba(17,17,17,0.05);
+    }
+
+    .feature-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .feature-copy {
+      font-size: 13px;
+      line-height: 1.55;
+      color: #302d27;
+    }
+
+    .stack {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .stack-chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.46);
+      border: 1px solid rgba(17,17,17,0.05);
+      font-size: 12px;
+      color: #2f2922;
+    }
+
+    .stack-chip strong {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #6f685d;
+    }
+
+    .signal {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 22px;
+      padding: 16px 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.45);
+      border: 1px solid rgba(17,17,17,0.06);
+    }
+
+    .signal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #d3b481, #9d7a44);
+      box-shadow: 0 0 18px rgba(185, 152, 98, 0.45);
+      flex: 0 0 auto;
+    }
+
+    .signal-copy {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #3d362d;
+    }
+
+    .stage-copy {
+      align-self: end;
+      justify-self: end;
+      pointer-events: auto;
+      margin-right: clamp(8px, 3vw, 32px);
+      margin-bottom: clamp(12px, 3vh, 26px);
+      text-align: left;
+      max-width: 360px;
+      color: rgba(56, 49, 40, 0.74);
+      padding: 18px 20px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.34);
+      border: 1px solid rgba(17,17,17,0.05);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 48px rgba(36, 28, 18, 0.07);
+    }
+
+    .stage-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(46, 42, 35, 0.62);
+      margin-bottom: 10px;
+    }
+
+    .instruction {
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(56, 49, 40, 0.62);
+    }
+
+    .stage-note {
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(56, 49, 40, 0.78);
+    }
+
+    .uploader {
+      margin-top: 14px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      pointer-events: auto;
+    }
+
+    .upload-button {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 999px;
+      background: #1a1a1a;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .upload-button input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .upload-note {
+      display: flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.56);
+      border: 1px solid rgba(17,17,17,0.06);
+      font-size: 12px;
+      color: #5f594f;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: #1d1915;
+      background: rgba(255,255,255,0.58);
+      border: 1px solid rgba(17,17,17,0.07);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .readable-section {
+      position: relative;
+      padding: 32px clamp(18px, 4vw, 56px) 72px;
+    }
+
+    .readable-wrap {
+      display: grid;
+      grid-template-columns: minmax(280px, 420px) minmax(320px, 720px);
+      gap: clamp(20px, 4vw, 48px);
+      align-items: start;
+    }
+
+    .readable-copy,
+    .receipt-preview-shell {
+      background: linear-gradient(180deg, rgba(255,255,255,0.74), rgba(255,255,255,0.5));
+      border: 1px solid rgba(17,17,17,0.06);
+      border-radius: 28px;
+      box-shadow:
+        0 24px 60px rgba(42, 33, 20, 0.08),
+        inset 0 1px 0 rgba(255,255,255,0.72);
+      backdrop-filter: blur(12px);
+    }
+
+    .readable-copy {
+      padding: 26px;
+    }
+
+    .section-kicker {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 46px);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+    }
+
+    .section-text {
+      margin: 16px 0 0;
+      color: #4a4339;
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .preview-points {
+      margin-top: 20px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .preview-point {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.5);
+      border: 1px solid rgba(17,17,17,0.05);
+      color: #393329;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .receipt-preview-shell {
+      padding: 20px;
+    }
+
+    .preview-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .preview-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #6a6256;
+      font-weight: 800;
+    }
+
+    .preview-status {
+      font-size: 12px;
+      color: #6a6256;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.58);
+      border: 1px solid rgba(17,17,17,0.05);
+    }
+
+    .receipt-preview-frame {
+      padding: clamp(12px, 2vw, 20px);
+      border-radius: 24px;
+      background: linear-gradient(180deg, #ede6da, #e5dccf);
+      border: 1px solid rgba(17,17,17,0.06);
+      overflow: auto;
+    }
+
+    #receiptPreview {
+      display: block;
+      width: min(100%, 640px);
+      height: auto;
+      margin: 0 auto;
+      background: #f8f5ef;
+      border-radius: 18px;
+      box-shadow: 0 30px 70px rgba(33, 24, 16, 0.12);
+    }
+
+    @media (max-width: 980px) {
+      .shell {
+        grid-template-columns: 1fr;
+        align-items: start;
+        gap: 18px;
+        padding: 18px;
+      }
+
+      .panel {
+        max-width: 100%;
+      }
+
+      .stage-copy {
+        justify-self: start;
+        align-self: start;
+        text-align: left;
+        margin: 0;
+        max-width: 420px;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+
+      .meta {
+        grid-template-columns: 1fr;
+      }
+
+      .stack {
+        grid-template-columns: 1fr;
+      }
+
+      .readable-wrap {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="scene"></canvas>
+
+  <main class="page">
+    <section class="hero">
+      <div class="shell">
+        <section class="panel">
+      <div class="brand-row">
+        <div class="eyebrow">MAXCHICHAR</div>
+        <div class="micro-links">
+          <a class="micro-link" href="https://github.com/maxchichar" target="_blank" rel="noreferrer">GitHub</a>
+          <a class="micro-link" href="https://x.com/maxchichar" target="_blank" rel="noreferrer">X / Social</a>
+        </div>
+      </div>
+      <h1>Turn static receipts into a premium, interactive presentation layer people can actually read and explore.</h1>
+      <p class="lead">
+        This application solves a common product problem: receipts and proof-of-payment artifacts usually feel disposable, unreadable, and visually weak. MAXCHICHAR turns them into a polished, physics-driven surface that can be showcased, inspected, and personalized.
+      </p>
+
+      <div class="problem">
+        <div class="problem-title">What It Solves</div>
+        <div class="problem-copy">
+          If you are building checkout flows, digital storefronts, dashboards, or proof-of-purchase experiences, this gives you a stronger presentation layer. Instead of showing a flat screenshot, the receipt becomes a readable hero object with motion, depth, and interaction.
+        </div>
+      </div>
+
+      <div class="actions">
+        <a class="button primary" href="https://github.com/maxchichar" target="_blank" rel="noreferrer">View Work</a>
+        <a class="button secondary" href="https://x.com/maxchichar" target="_blank" rel="noreferrer">Follow On X</a>
+      </div>
+
+      <div class="meta">
+        <div class="meta-card">
+          <div class="meta-label">GitHub</div>
+          <a class="meta-value" href="https://github.com/maxchichar" target="_blank" rel="noreferrer">github.com/maxchichar</a>
+        </div>
+        <div class="meta-card">
+          <div class="meta-label">X</div>
+          <a class="meta-value" href="https://x.com/maxchichar" target="_blank" rel="noreferrer">@maxchichar</a>
+        </div>
+      </div>
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature-title">Readable Output</div>
+          <div class="feature-copy">The receipt is larger, front-facing, and easier to inspect without losing the premium physical feel.</div>
+        </div>
+        <div class="feature">
+          <div class="feature-title">User Uploads</div>
+          <div class="feature-copy">Visitors can upload their own receipt image and instantly project it onto the live 3D surface.</div>
+        </div>
+        <div class="feature">
+          <div class="feature-title">Presentation Layer</div>
+          <div class="feature-copy">Useful for storefronts, payment confirmations, digital proofs, demos, and premium product storytelling.</div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="stack-chip"><strong>UI</strong><span>Glass panels + editorial layout</span></div>
+        <div class="stack-chip"><strong>Render</strong><span>Canvas triangle mapping</span></div>
+        <div class="stack-chip"><strong>Physics</strong><span>Custom Verlet cloth system</span></div>
+        <div class="stack-chip"><strong>Input</strong><span>Pointer drag + file upload</span></div>
+      </div>
+
+      <div class="signal">
+        <div class="signal-dot"></div>
+        <div class="signal-copy">
+          Built with vanilla JavaScript, HTML canvas texture generation, custom mesh deformation, and browser-native file handling for uploaded receipt assets.
+        </div>
+      </div>
+        </section>
+
+        <aside class="stage-copy">
+      <div class="stage-label">Live Output</div>
+      <div class="instruction">Grab and drag the receipt</div>
+      <div class="stage-note">
+        Upload a receipt image or use the default generated one. The system maps it onto a live 3D sheet so users can inspect it in a more premium, product-ready format.
+      </div>
+      <div class="uploader">
+        <label class="upload-button">
+          Upload Receipt
+          <input id="receiptUpload" type="file" accept="image/*" />
+        </label>
+        <div class="upload-note" id="uploadStatus">Using default generated receipt</div>
+      </div>
+      <div class="social-links">
+        <a class="social-link" href="https://github.com/maxchichar" target="_blank" rel="noreferrer">github.com/maxchichar</a>
+        <a class="social-link" href="https://x.com/maxchichar" target="_blank" rel="noreferrer">@maxchichar</a>
+      </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="readable-section">
+      <div class="readable-wrap">
+        <div class="readable-copy">
+          <div class="section-kicker">Readable Receipt View</div>
+          <h2 class="section-title">A clean, flat preview for people who need the details immediately.</h2>
+          <p class="section-text">
+            The 3D receipt is the hero interaction, but this section gives users a dependable reading surface. It mirrors the live receipt texture so uploaded receipts and generated receipts stay easy to inspect.
+          </p>
+          <div class="preview-points">
+            <div class="preview-point">Clear text hierarchy for totals, dates, line items, and reference details.</div>
+            <div class="preview-point">Useful for demos, storefront confirmations, payment proof screens, and client presentations.</div>
+            <div class="preview-point">Synced with the upload flow so the same receipt can be experienced in both 3D and readable document form.</div>
+          </div>
+        </div>
+
+        <div class="receipt-preview-shell">
+          <div class="preview-topbar">
+            <div class="preview-label">Receipt Preview</div>
+            <div class="preview-status" id="previewStatus">Readable synchronized view</div>
+          </div>
+          <div class="receipt-preview-frame">
+            <canvas id="receiptPreview" width="1024" height="1880"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById("scene");
+      const ctx = canvas.getContext("2d");
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+
+      let width = 1;
+      let height = 1;
+      let time = 0;
+      let last = performance.now();
+
+      const COLS = 26;
+      const ROWS = 52;
+      const SHEET_W = 1.45;
+      const SHEET_H = 2.68;
+      const GRAVITY = -3.0;
+      const ITERATIONS = 8;
+      const FOV = 1.72;
+      const CAMERA_Z = 4.35;
+
+      const sheetCanvas = document.createElement("canvas");
+      sheetCanvas.width = 1024;
+      sheetCanvas.height = 1880;
+      const sheetCtx = sheetCanvas.getContext("2d");
+
+      const backCanvas = document.createElement("canvas");
+      backCanvas.width = sheetCanvas.width;
+      backCanvas.height = sheetCanvas.height;
+      const backCtx = backCanvas.getContext("2d");
+      const uploadInput = document.getElementById("receiptUpload");
+      const uploadStatus = document.getElementById("uploadStatus");
+      const previewCanvas = document.getElementById("receiptPreview");
+      const previewCtx = previewCanvas.getContext("2d");
+      const previewStatus = document.getElementById("previewStatus");
+
+      const particles = [];
+      const constraints = [];
+      const projected = [];
+      const world = [];
+      const motes = [];
+
+      const state = {
+        boot: 0,
+        pulse: 0,
+        disturbance: 0,
+        flash: 0,
+        pointer: { x: 0, y: 0, nx: 0, ny: 0, active: false },
+        camera: { x: 0, y: 0, z: 0 },
+        drag: { active: false, index: -1, screenX: 0, screenY: 0, zLift: 0, velocity: 0 },
+        receipt: { x: 0.635, y: 0.54 },
+        uploadedReceipt: null
+      };
+
+      const receiptLines = [
+        { type: "title", text: "THE FLORNRM SHOP" },
+        { type: "center", text: "42 Mesh Lane, WebGL City" },
+        { type: "center", text: "Tel: (555) 042-1337" },
+        { type: "space" },
+        { type: "left", text: "Date: 2026-02-23 14:17" },
+        { type: "left", text: "Order: #00382" },
+        { type: "space" },
+        { type: "dash" },
+        { type: "item", left: "Vertex Shader", right: "$4.20" },
+        { type: "item", left: "Fragment Shader", right: "$3.50" },
+        { type: "item", left: "Normal Map", right: "$2.80" },
+        { type: "item", left: "UV Unwrap", right: "$1.50" },
+        { type: "item", left: "Cloth Simulation", right: "$6.00" },
+        { type: "dash" },
+        { type: "item", left: "Subtotal", right: "$18.00" },
+        { type: "item", left: "Tax (8%)", right: "$1.44" },
+        { type: "thick" },
+        { type: "total", left: "TOTAL", right: "$19.44" },
+        { type: "space" },
+        { type: "center", text: "Thank you for visiting!" },
+        { type: "centerSmall", text: "http://github.com/maxchichar" }
+      ];
+
+      function resize() {
+        width = Math.max(1, window.innerWidth);
+        height = Math.max(1, window.innerHeight);
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function buildMotes() {
+        motes.length = 0;
+        for (let i = 0; i < 64; i++) {
+          motes.push({
+            x: Math.random(),
+            y: Math.random(),
+            r: 1 + Math.random() * 2.4,
+            a: 0.04 + Math.random() * 0.06,
+            v: 0.15 + Math.random() * 0.4
+          });
+        }
+      }
+
+      function buildMesh() {
+        particles.length = 0;
+        constraints.length = 0;
+        projected.length = 0;
+        world.length = 0;
+
+        for (let y = 0; y < ROWS; y++) {
+          for (let x = 0; x < COLS; x++) {
+            const u = x / (COLS - 1);
+            const v = y / (ROWS - 1);
+            const px = (u - 0.5) * SHEET_W;
+            const py = 1.15 - v * SHEET_H;
+            const pz = Math.sin((u - 0.5) * Math.PI) * 0.02;
+            particles.push({
+              x: px, y: py, z: pz,
+              px, py, pz,
+              u, v,
+              pinned: y === 0
+            });
+          }
+        }
+
+        function idx(x, y) {
+          return y * COLS + x;
+        }
+
+        function add(a, b, stiffness) {
+          const pa = particles[a];
+          const pb = particles[b];
+          constraints.push({
+            a, b, stiffness,
+            rest: Math.hypot(pb.x - pa.x, pb.y - pa.y, pb.z - pa.z)
+          });
+        }
+
+        for (let y = 0; y < ROWS; y++) {
+          for (let x = 0; x < COLS; x++) {
+            if (x < COLS - 1) add(idx(x, y), idx(x + 1, y), 0.95);
+            if (y < ROWS - 1) add(idx(x, y), idx(x, y + 1), 0.95);
+            if (x < COLS - 1 && y < ROWS - 1) {
+              add(idx(x, y), idx(x + 1, y + 1), 0.62);
+              add(idx(x + 1, y), idx(x, y + 1), 0.62);
+            }
+            if (x < COLS - 2) add(idx(x, y), idx(x + 2, y), 0.26);
+            if (y < ROWS - 2) add(idx(x, y), idx(x, y + 2), 0.26);
+          }
+        }
+      }
+
+      function drawReceiptTexture(now) {
+        const g = sheetCtx;
+        if (state.uploadedReceipt) {
+          g.clearRect(0, 0, sheetCanvas.width, sheetCanvas.height);
+          const paper = g.createLinearGradient(0, 0, 0, sheetCanvas.height);
+          paper.addColorStop(0, "#fbfaf6");
+          paper.addColorStop(1, "#ece5db");
+          g.fillStyle = paper;
+          g.fillRect(0, 0, sheetCanvas.width, sheetCanvas.height);
+
+          const img = state.uploadedReceipt;
+          const scale = Math.min(sheetCanvas.width / img.width, sheetCanvas.height / img.height);
+          const dw = img.width * scale;
+          const dh = img.height * scale;
+          const dx = (sheetCanvas.width - dw) * 0.5;
+          const dy = (sheetCanvas.height - dh) * 0.5;
+          g.drawImage(img, dx, dy, dw, dh);
+          g.strokeStyle = "rgba(0,0,0,0.08)";
+          g.lineWidth = 2;
+          g.strokeRect(dx, dy, dw, dh);
+          drawBackTexture();
+          updateReceiptPreview();
+          return;
+        }
+
+        const reveal = Math.min(receiptLines.length, Math.floor(state.boot * (receiptLines.length + 1)));
+        const blink = 0.97 + Math.sin(now * 0.004) * 0.01;
+
+        g.clearRect(0, 0, sheetCanvas.width, sheetCanvas.height);
+
+        const paper = g.createLinearGradient(0, 0, 0, sheetCanvas.height);
+        paper.addColorStop(0, "#fbfaf6");
+        paper.addColorStop(0.52, "#f5f1ea");
+        paper.addColorStop(1, "#ece5db");
+        g.fillStyle = paper;
+        g.fillRect(0, 0, sheetCanvas.width, sheetCanvas.height);
+
+        g.fillStyle = "rgba(255,255,255,0.42)";
+        g.fillRect(26, 0, 12, sheetCanvas.height);
+        g.fillStyle = "rgba(22,17,12,0.05)";
+        g.fillRect(sheetCanvas.width - 34, 0, 18, sheetCanvas.height);
+
+        g.strokeStyle = "rgba(0,0,0,0.032)";
+        g.lineWidth = 1;
+        for (let i = 0; i < 40; i++) {
+          const y = 52 + i * 44;
+          g.beginPath();
+          g.moveTo(42, y);
+          g.lineTo(sheetCanvas.width - 42, y);
+          g.stroke();
+        }
+
+        const left = 82;
+        const right = sheetCanvas.width - 82;
+        let y = 118;
+        let shown = 0;
+
+        function drawDash(thick) {
+          g.save();
+          g.strokeStyle = thick ? "rgba(12,12,12,0.78)" : "rgba(12,12,12,0.56)";
+          g.lineWidth = thick ? 2.2 : 1.2;
+          if (!thick) g.setLineDash([10, 8]);
+          g.beginPath();
+          g.moveTo(left, y);
+          g.lineTo(right, y);
+          g.stroke();
+          g.restore();
+          y += thick ? 34 : 32;
+        }
+
+        for (let i = 0; i < receiptLines.length && shown < reveal; i++) {
+          const line = receiptLines[i];
+          if (line.type === "space") {
+            y += 30;
+            shown++;
+            continue;
+          }
+
+          if (line.type === "dash") {
+            drawDash(false);
+            shown++;
+            continue;
+          }
+
+          if (line.type === "thick") {
+            drawDash(true);
+            shown++;
+            continue;
+          }
+
+          g.fillStyle = `rgba(14,14,14,${blink})`;
+          g.textBaseline = "middle";
+
+          if (line.type === "title") {
+            g.font = "700 49px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+            g.textAlign = "center";
+            g.fillText(line.text, sheetCanvas.width * 0.5, y);
+            y += 52;
+          } else if (line.type === "center") {
+            g.font = "27px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+            g.textAlign = "center";
+            g.fillText(line.text, sheetCanvas.width * 0.5, y);
+            y += 38;
+          } else if (line.type === "centerSmall") {
+            g.font = "22px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+            g.textAlign = "center";
+            g.fillText(line.text, sheetCanvas.width * 0.5, y);
+            y += 32;
+          } else if (line.type === "left") {
+            g.font = "27px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+            g.textAlign = "left";
+            g.fillText(line.text, left, y);
+            y += 38;
+          } else if (line.type === "item") {
+            g.font = "27px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+            g.textAlign = "left";
+            g.fillText(line.left, left, y);
+            g.textAlign = "right";
+            g.fillText(line.right, right, y);
+            y += 38;
+          } else if (line.type === "total") {
+            g.font = "700 33px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+            g.textAlign = "left";
+            g.fillText(line.left, left, y);
+            g.textAlign = "right";
+            g.fillText(line.right, right, y);
+            y += 44;
+          }
+
+          shown++;
+        }
+
+        const logoGlow = g.createRadialGradient(sheetCanvas.width * 0.5, 100, 6, sheetCanvas.width * 0.5, 100, 220);
+        logoGlow.addColorStop(0, "rgba(185, 152, 98, 0.09)");
+        logoGlow.addColorStop(1, "rgba(185, 152, 98, 0)");
+        g.fillStyle = logoGlow;
+        g.fillRect(0, 0, sheetCanvas.width, 260);
+
+        drawBackTexture();
+        updateReceiptPreview();
+      }
+
+      function drawBackTexture() {
+        const g = backCtx;
+        g.clearRect(0, 0, backCanvas.width, backCanvas.height);
+        const grad = g.createLinearGradient(0, 0, 0, backCanvas.height);
+        grad.addColorStop(0, "#e8e0d4");
+        grad.addColorStop(1, "#ddd3c6");
+        g.fillStyle = grad;
+        g.fillRect(0, 0, backCanvas.width, backCanvas.height);
+
+        g.strokeStyle = "rgba(0,0,0,0.05)";
+        g.lineWidth = 1;
+        for (let i = 0; i < 18; i++) {
+          const y = 150 + i * 88;
+          g.beginPath();
+          g.moveTo(84, y);
+          g.lineTo(backCanvas.width - 84, y);
+          g.stroke();
+        }
+
+        g.font = "700 32px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+        g.fillStyle = "rgba(0,0,0,0.08)";
+        g.fillText("MAXCHICHAR OUTPUT SHEET", 84, 118);
+      }
+
+      function updateReceiptPreview() {
+        previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+        previewCtx.drawImage(sheetCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
+      }
+
+      function updatePointer(x, y) {
+        state.pointer.x = x;
+        state.pointer.y = y;
+        state.pointer.nx = (x / width - 0.5) * 2;
+        state.pointer.ny = (y / height - 0.5) * 2;
+      }
+
+      function updatePhysics(dt) {
+        state.boot = Math.min(1, state.boot + dt * 0.26);
+        state.pulse *= Math.pow(0.16, dt);
+        state.disturbance *= Math.pow(0.18, dt);
+        state.flash *= Math.pow(0.05, dt);
+
+        const targetCamX = state.pointer.nx * 0.09;
+        const targetCamY = state.pointer.ny * 0.065;
+        const targetCamZ = state.drag.active ? 0.12 + state.drag.velocity * 0.08 : 0;
+        state.camera.x += (targetCamX - state.camera.x) * Math.min(1, dt * 4.2);
+        state.camera.y += (targetCamY - state.camera.y) * Math.min(1, dt * 4.2);
+        state.camera.z += (targetCamZ - state.camera.z) * Math.min(1, dt * 4.6);
+
+        for (let i = 0; i < COLS; i++) {
+          const p = particles[i];
+          const u = i / (COLS - 1);
+          const arch = Math.sin(u * Math.PI) * 0.022;
+          const drift = Math.sin(time * 0.8 + u * 2.2) * 0.01;
+          p.x = (u - 0.5) * SHEET_W;
+          p.y = 1.12 + drift;
+          p.z = arch + state.camera.x * 0.016;
+          p.px = p.x;
+          p.py = p.y;
+          p.pz = p.z;
+        }
+
+        for (let i = COLS; i < particles.length; i++) {
+          const p = particles[i];
+          if (state.drag.active && i === state.drag.index) {
+            const pr = projected[i] || { cameraZ: CAMERA_Z };
+            const factor = FOV * Math.min(width, height) * 0.5 / Math.max(0.2, pr.cameraZ);
+            const wx = (state.drag.screenX - width * 0.5) / factor;
+            const wy = -(state.drag.screenY - height * 0.5) / factor;
+            p.px = p.x;
+            p.py = p.y;
+            p.pz = p.z;
+            p.x += (wx - p.x) * 0.48;
+            p.y += (wy - p.y) * 0.48;
+            p.z += ((state.drag.zLift + state.camera.z + state.pointer.nx * 0.16) - p.z) * 0.24;
+            continue;
+          }
+
+          const vx = (p.x - p.px) * 0.992;
+          const vy = (p.y - p.py) * 0.992;
+          const vz = (p.z - p.pz) * 0.992;
+
+          p.px = p.x;
+          p.py = p.y;
+          p.pz = p.z;
+
+          const wave = Math.sin(time * 3.2 + p.v * 10.2 + p.u * 6.4) * (0.0005 + state.disturbance * 0.0022);
+          p.x += vx;
+          p.y += vy + GRAVITY * dt * dt;
+          p.z += vz + wave;
+        }
+
+        for (let iter = 0; iter < ITERATIONS; iter++) {
+          for (let i = 0; i < constraints.length; i++) {
+            const c = constraints[i];
+            const a = particles[c.a];
+            const b = particles[c.b];
+
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const dz = b.z - a.z;
+            const dist = Math.hypot(dx, dy, dz) || 1;
+            const diff = ((dist - c.rest) / dist) * c.stiffness;
+            const ox = dx * diff * 0.5;
+            const oy = dy * diff * 0.5;
+            const oz = dz * diff * 0.5;
+
+            if (!a.pinned && !(state.drag.active && c.a === state.drag.index)) {
+              a.x += ox;
+              a.y += oy;
+              a.z += oz;
+            }
+            if (!b.pinned && !(state.drag.active && c.b === state.drag.index)) {
+              b.x -= ox;
+              b.y -= oy;
+              b.z -= oz;
+            }
+          }
+        }
+      }
+
+      function worldVertex(p) {
+        const idle = Math.sin(time * 1.45) * 0.5 + 0.5;
+        const bend = Math.sin(p.v * Math.PI) * 0.01;
+        const curl = Math.sin(p.u * Math.PI * 2 + time * 0.4) * 0.004;
+          const px = 0.76 + Math.sin(time * 0.42) * 0.024 + state.camera.x * 0.16;
+          const py = 0.02 + Math.cos(time * 0.54) * 0.012 + state.camera.y * 0.16;
+          const pz = 0.08 + state.camera.z + Math.sin(time * 0.8) * 0.015;
+
+        return {
+          x: p.x + px,
+          y: p.y + py,
+          z: p.z + p.u * 0.012 + bend + curl + pz + idle * 0.006
+        };
+      }
+
+      function projectPoint(v) {
+        const yaw = state.camera.x * 0.24;
+        const pitch = -state.camera.y * 0.18;
+        const cy = Math.cos(yaw), sy = Math.sin(yaw);
+        const cx = Math.cos(pitch), sx = Math.sin(pitch);
+
+        let x = v.x;
+        let y = v.y;
+        let z = v.z;
+
+        const rx = x * cy - z * sy;
+        const rz = x * sy + z * cy;
+        x = rx;
+        z = rz;
+
+        const ry = y * cx - z * sx;
+        const rz2 = y * sx + z * cx;
+        y = ry;
+        z = rz2;
+
+        const cameraZ = CAMERA_Z - z;
+        const factor = FOV * Math.min(width, height) * 0.5 / Math.max(0.18, cameraZ);
+
+        return {
+          x: width * state.receipt.x + x * factor,
+          y: height * state.receipt.y - y * factor,
+          cameraZ
+        };
+      }
+
+      function sub(a, b) {
+        return { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z };
+      }
+
+      function cross(a, b) {
+        return {
+          x: a.y * b.z - a.z * b.y,
+          y: a.z * b.x - a.x * b.z,
+          z: a.x * b.y - a.y * b.x
+        };
+      }
+
+      function dot(a, b) {
+        return a.x * b.x + a.y * b.y + a.z * b.z;
+      }
+
+      function normalize(v) {
+        const m = Math.hypot(v.x, v.y, v.z) || 1;
+        return { x: v.x / m, y: v.y / m, z: v.z / m };
+      }
+
+      function drawTexturedTriangle(g, img, p0, p1, p2, uv0, uv1, uv2, shade) {
+        const u0 = uv0.x * img.width;
+        const v0 = uv0.y * img.height;
+        const u1 = uv1.x * img.width;
+        const v1 = uv1.y * img.height;
+        const u2 = uv2.x * img.width;
+        const v2 = uv2.y * img.height;
+
+        const denom = u0 * (v1 - v2) + u1 * (v2 - v0) + u2 * (v0 - v1);
+        if (!isFinite(denom) || Math.abs(denom) < 0.0001) return;
+
+        g.save();
+        g.beginPath();
+        g.moveTo(p0.x, p0.y);
+        g.lineTo(p1.x, p1.y);
+        g.lineTo(p2.x, p2.y);
+        g.closePath();
+        g.clip();
+
+        const a = (p0.x * (v1 - v2) + p1.x * (v2 - v0) + p2.x * (v0 - v1)) / denom;
+        const b = (p0.y * (v1 - v2) + p1.y * (v2 - v0) + p2.y * (v0 - v1)) / denom;
+        const c = (p0.x * (u2 - u1) + p1.x * (u0 - u2) + p2.x * (u1 - u0)) / denom;
+        const d = (p0.y * (u2 - u1) + p1.y * (u0 - u2) + p2.y * (u1 - u0)) / denom;
+        const e = (p0.x * (u1 * v2 - u2 * v1) + p1.x * (u2 * v0 - u0 * v2) + p2.x * (u0 * v1 - u1 * v0)) / denom;
+        const f = (p0.y * (u1 * v2 - u2 * v1) + p1.y * (u2 * v0 - u0 * v2) + p2.y * (u0 * v1 - u1 * v0)) / denom;
+
+        g.transform(a, b, c, d, e, f);
+        g.drawImage(img, 0, 0);
+        g.restore();
+
+        g.save();
+        g.beginPath();
+        g.moveTo(p0.x, p0.y);
+        g.lineTo(p1.x, p1.y);
+        g.lineTo(p2.x, p2.y);
+        g.closePath();
+        g.fillStyle = `rgba(16, 14, 11, ${Math.max(0, 1 - shade) * 0.5})`;
+        g.fill();
+        g.restore();
+      }
+
+      function renderBackground(now) {
+        ctx.clearRect(0, 0, width, height);
+
+        const wash = ctx.createRadialGradient(width * 0.75, height * 0.34, 20, width * 0.52, height * 0.52, Math.max(width, height) * 0.72);
+        wash.addColorStop(0, "rgba(255,255,255,0.72)");
+        wash.addColorStop(0.44, "rgba(242,236,227,0.72)");
+        wash.addColorStop(1, "rgba(229,222,211,0)");
+        ctx.fillStyle = wash;
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        for (let i = 0; i < motes.length; i++) {
+          const m = motes[i];
+          const x = m.x * width + Math.sin(time * m.v + i) * 18 + state.camera.x * 20;
+          const y = m.y * height + Math.cos(time * m.v * 0.8 + i * 0.3) * 14 + state.camera.y * 16;
+          ctx.fillStyle = `rgba(195, 171, 130, ${m.a})`;
+          ctx.beginPath();
+          ctx.arc(x, y, m.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+
+        const halo = ctx.createRadialGradient(width * 0.72, height * 0.48, 30, width * 0.72, height * 0.48, width * 0.2);
+        halo.addColorStop(0, `rgba(185,152,98,${0.08 + state.pulse * 0.06})`);
+        halo.addColorStop(1, "rgba(185,152,98,0)");
+        ctx.fillStyle = halo;
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      function renderReceipt() {
+        for (let i = 0; i < particles.length; i++) {
+          world[i] = worldVertex(particles[i]);
+          projected[i] = projectPoint(world[i]);
+        }
+
+        const triangles = [];
+
+        function pushTri(i0, i1, i2) {
+          const v0 = world[i0], v1 = world[i1], v2 = world[i2];
+          const p0 = projected[i0], p1 = projected[i1], p2 = projected[i2];
+
+          let n = normalize(cross(sub(v1, v0), sub(v2, v0)));
+          const center = {
+            x: (v0.x + v1.x + v2.x) / 3,
+            y: (v0.y + v1.y + v2.y) / 3,
+            z: (v0.z + v1.z + v2.z) / 3
+          };
+          const view = normalize({ x: -center.x, y: -center.y * 0.35, z: CAMERA_Z - center.z });
+          const front = dot(n, view) > 0;
+          if (!front) n = { x: -n.x, y: -n.y, z: -n.z };
+
+          const light = normalize({ x: -0.25 + state.camera.x * 0.8, y: 0.22 - state.camera.y * 0.6, z: 1 });
+          const shade = Math.max(0.24, 0.28 + dot(n, light) * 0.74);
+
+          triangles.push({
+            p0, p1, p2,
+            uv0: { x: particles[i0].u, y: particles[i0].v },
+            uv1: { x: particles[i1].u, y: particles[i1].v },
+            uv2: { x: particles[i2].u, y: particles[i2].v },
+            depth: (p0.cameraZ + p1.cameraZ + p2.cameraZ) / 3,
+            front,
+            shade
+          });
+        }
+
+        for (let y = 0; y < ROWS - 1; y++) {
+          for (let x = 0; x < COLS - 1; x++) {
+            const i = y * COLS + x;
+            pushTri(i, i + 1, i + COLS);
+            pushTri(i + 1, i + COLS + 1, i + COLS);
+          }
+        }
+
+        triangles.sort((a, b) => b.depth - a.depth);
+
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        for (let i = 0; i < projected.length; i++) {
+          const p = projected[i];
+          minX = Math.min(minX, p.x);
+          minY = Math.min(minY, p.y);
+          maxX = Math.max(maxX, p.x);
+          maxY = Math.max(maxY, p.y);
+        }
+
+        const shadow = ctx.createRadialGradient((minX + maxX) * 0.5, maxY + 34, 10, (minX + maxX) * 0.5, maxY + 34, Math.max(80, (maxX - minX) * 0.45));
+        shadow.addColorStop(0, "rgba(45,35,20,0.16)");
+        shadow.addColorStop(1, "rgba(45,35,20,0)");
+        ctx.fillStyle = shadow;
+        ctx.fillRect(minX - 100, maxY - 40, (maxX - minX) + 200, 220);
+
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        ctx.shadowBlur = 26 + state.flash * 26;
+        ctx.shadowColor = `rgba(185, 152, 98, ${0.2 + state.flash * 0.2})`;
+        ctx.strokeStyle = `rgba(185, 152, 98, ${0.12 + state.flash * 0.18})`;
+        ctx.lineWidth = 1.3;
+        ctx.strokeRect(minX - 12, minY - 12, (maxX - minX) + 24, (maxY - minY) + 24);
+        ctx.restore();
+
+        for (let i = 0; i < triangles.length; i++) {
+          const tri = triangles[i];
+          drawTexturedTriangle(ctx, tri.front ? backCanvas : sheetCanvas, tri.p0, tri.p1, tri.p2, tri.uv0, tri.uv1, tri.uv2, tri.shade);
+        }
+      }
+
+      function renderGrabIndicator() {
+        if (!state.pointer.active) return;
+        const radius = state.drag.active ? 18 + state.pulse * 10 : 12;
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        ctx.fillStyle = `rgba(185, 152, 98, ${state.drag.active ? 0.14 : 0.05})`;
+        ctx.strokeStyle = `rgba(32, 24, 16, ${state.drag.active ? 0.8 : 0.26})`;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(state.pointer.x, state.pointer.y, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        if (state.drag.active) {
+          ctx.beginPath();
+          ctx.arc(state.pointer.x, state.pointer.y, radius + 12 + Math.sin(time * 8) * 2, 0, Math.PI * 2);
+          ctx.strokeStyle = "rgba(185, 152, 98, 0.32)";
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function nearestParticle(x, y) {
+        let best = -1;
+        let bestDist = 46;
+        for (let i = COLS; i < projected.length; i++) {
+          const p = projected[i];
+          const d = Math.hypot(p.x - x, p.y - y);
+          if (d < bestDist) {
+            bestDist = d;
+            best = i;
+          }
+        }
+        return best;
+      }
+
+      function onPointerDown(x, y) {
+        updatePointer(x, y);
+        state.pointer.active = true;
+        const index = nearestParticle(x, y);
+        if (index !== -1) {
+          state.drag.active = true;
+          state.drag.index = index;
+          state.drag.screenX = x;
+          state.drag.screenY = y;
+          state.drag.zLift = world[index] ? world[index].z : 0;
+          state.pulse = 0.85;
+          state.flash = 1;
+        }
+      }
+
+      function onPointerMove(x, y) {
+        const dx = x - state.pointer.x;
+        const dy = y - state.pointer.y;
+        updatePointer(x, y);
+        state.pointer.active = true;
+
+        if (state.drag.active) {
+          const speed = Math.min(1.25, Math.hypot(dx, dy) / 26);
+          state.drag.velocity = speed;
+          state.drag.screenX = x;
+          state.drag.screenY = y;
+          state.drag.zLift += dx * 0.0022 - dy * 0.0032;
+          state.drag.zLift *= 0.97;
+          state.pulse = Math.min(1.2, state.pulse + speed * 0.26);
+          state.disturbance = Math.min(1.2, state.disturbance + speed * 0.24);
+          state.flash = Math.min(1, state.flash + speed * 0.34);
+        }
+      }
+
+      function onPointerUp() {
+        state.drag.active = false;
+        state.drag.index = -1;
+        state.drag.zLift = 0;
+      }
+
+      canvas.addEventListener("pointerdown", (e) => {
+        canvas.setPointerCapture(e.pointerId);
+        onPointerDown(e.clientX, e.clientY);
+      });
+      canvas.addEventListener("pointermove", (e) => onPointerMove(e.clientX, e.clientY));
+      canvas.addEventListener("pointerup", onPointerUp);
+      canvas.addEventListener("pointercancel", onPointerUp);
+      canvas.addEventListener("pointerleave", () => {
+        state.pointer.active = false;
+      });
+      uploadInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            state.uploadedReceipt = img;
+            const shortName = file.name.length > 32 ? file.name.slice(0, 29) + "..." : file.name;
+            uploadStatus.textContent = shortName;
+            previewStatus.textContent = "Previewing " + shortName;
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+      window.addEventListener("resize", resize);
+
+      function frame(now) {
+        const dt = Math.min(0.033, (now - last) / 1000 || 0.016);
+        last = now;
+        time += dt;
+
+        updatePhysics(dt);
+        drawReceiptTexture(now);
+        renderBackground(now);
+        renderReceipt();
+        renderGrabIndicator();
+
+        requestAnimationFrame(frame);
+      }
+
+      resize();
+      buildMesh();
+      buildMotes();
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>
